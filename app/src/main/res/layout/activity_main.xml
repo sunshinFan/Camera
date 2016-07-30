@@ -1,0 +1,58 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+
+    <TextView
+        android:id="@+id/system"
+        android:text="@string/system"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="#ffaa631c"/>
+
+
+
+    <Button
+            android:id="@+id/picture"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_below="@id/system"
+            android:text="@string/catch_picture"
+            android:onClick="CatchPicture"/>
+
+    <Button
+        android:id="@+id/report"
+        android:layout_width="match_parent"
+        android:layout_weight="4"
+        android:layout_height="100dp"
+        android:layout_below="@id/picture"
+        android:text="@string/report"
+        android:onClick="readReport"/>
+
+    <Button
+        android:id="@+id/story"
+        android:layout_width="match_parent"
+        android:layout_weight="4"
+        android:layout_height="100dp"
+        android:layout_below="@id/report"
+        android:text="@string/story"
+        android:onClick="readStory"/>
+
+
+
+
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/picture"
+        />
+
+
+</RelativeLayout>
+
+
