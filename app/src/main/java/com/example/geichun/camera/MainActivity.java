@@ -9,12 +9,6 @@ import android.widget.EditText;
 import android.view.View;
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.MediaStore;
-import java.io.File;
-import android.os.Environment;
-import android.util.Log;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -57,5 +51,10 @@ public class MainActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
-
 }
+
+
+
+
+
+
