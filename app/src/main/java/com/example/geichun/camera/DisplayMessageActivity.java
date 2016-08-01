@@ -79,6 +79,8 @@ public class DisplayMessageActivity extends ActionBarActivity {
             mPreview = new CameraPreview(this, mCamera);
             FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview );
             preview.addView(mPreview);
+        //    mCamera.setDisplayOrientation(90);
+
 
             Button captureButton = (Button) findViewById(R.id.send );
             captureButton.setOnClickListener( new CaptureButtonOnClickListener());
