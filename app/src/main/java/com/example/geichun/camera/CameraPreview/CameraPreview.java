@@ -22,6 +22,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera;
     private List<Camera.Size> mSupportedPreviewSizes;
     private Camera.Size mPreviewSize;
+    private float oldDist = 1f;
 
     public CameraPreview(Context context, Camera camera) {
         super(context);
@@ -186,12 +187,61 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 camera.setParameters(params);
             }
         });
+
+        Rect meteringRect = calculateTapArea(event.getX(), event.getY(), 1.5f, previewSize);
+
+        if (params.getMaxNumMeteringAreas() > 0) {
+            List<Camera.Area> meteringAreas = new ArrayList<Camera.Area>();
+            meteringAreas.add(new Camera.Area(meteringRect, 800));
+            params.setMeteringAreas(meteringAreas);
+        } else {
+            Log.i(TAG, "metering areas not supported");
+        }
     }
 
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getPointerCount() == 1) {
             handleFocus(event, mCamera);
         }
+        else {
+            switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    oldDist = getFingerSpacing(event);
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float newDist = getFingerSpacing(event);
+                    if (newDist > oldDist) {
+                        handleZoom(true, mCamera);
+                    } else if (newDist < oldDist) {
+                        handleZoom(false, mCamera);
+                    }
+                    oldDist = newDist;
+                    break;
+            }
+        }
         return true;
+    }
+
+    private static float getFingerSpacing(MotionEvent event) {
+        float x = event.getX(0) - event.getX(1);
+        float y = event.getY(0) - event.getY(1);
+        return (float) Math.sqrt(x * x + y * y);
+    }
+
+    private void handleZoom(boolean isZoomIn, Camera camera) {
+        Camera.Parameters params = camera.getParameters();
+        if (params.isZoomSupported()) {
+            int maxZoom = params.getMaxZoom();
+            int zoom = params.getZoom();
+            if (isZoomIn && zoom < maxZoom) {
+                zoom=zoom+2;
+            } else if (zoom > 0) {
+                zoom=zoom-2;
+            }
+            params.setZoom(zoom);
+            camera.setParameters(params);
+        } else {
+            Log.i(TAG, "zoom not supported");
+        }
     }
 }
