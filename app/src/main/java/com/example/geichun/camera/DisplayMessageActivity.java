@@ -1,7 +1,10 @@
 package com.example.geichun.camera;
 import com.example.geichun.camera.CameraPreview.CameraPreview;
+import com.example.geichun.camera.CameraPreview.FocusImage;
 
 
+import android.graphics.Color;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
@@ -10,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Intent;
+import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.RelativeLayout;
@@ -45,6 +49,7 @@ public class DisplayMessageActivity extends ActionBarActivity {
 
     private Camera mCamera;
     private CameraPreview mPreview;
+    private FocusImage mFocus;
     String TAG= "CAMERAAPI";
     Intent intent = getIntent();
 
@@ -79,12 +84,31 @@ public class DisplayMessageActivity extends ActionBarActivity {
             mPreview = new CameraPreview(this, mCamera);
             FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview );
             preview.addView(mPreview);
-        //    mCamera.setDisplayOrientation(90);
+
+            mFocus = new FocusImage(this);
+            preview.addView(mFocus);
+
+         //   mFocus.setOnTouchListener(new OnTouchListener());
+
 
 
             Button captureButton = (Button) findViewById(R.id.send );
             captureButton.setOnClickListener( new CaptureButtonOnClickListener());
         }
+
+    public class OnTouchListener implements View.OnTouchListener {
+        public boolean onTouch(View v, MotionEvent event) {
+            Rect touchRect = new Rect(
+                    (int)(event.getX()-100),
+                    (int)(event.getY()-100),
+                    (int)(event.getX()+100),
+                    (int)(event.getY()+100));
+            if (event.getAction() == MotionEvent.ACTION_DOWN){
+                mFocus.DrawFocusRect(touchRect , Color.BLUE);
+                return true;}
+            else return false;
+        }
+    }
 
     public class CaptureButtonOnClickListener implements View.OnClickListener{
         public void onClick(View v) {

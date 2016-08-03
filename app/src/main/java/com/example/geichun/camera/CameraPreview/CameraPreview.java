@@ -1,4 +1,6 @@
 package com.example.geichun.camera.CameraPreview;
+import com.example.geichun.camera.DisplayMessageActivity;
+import com.example.geichun.camera.R;
 
 import android.content.Context;
 import android.hardware.Camera;
@@ -8,6 +10,13 @@ import android.view.SurfaceView;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.MotionEvent;
+import android.graphics.PixelFormat;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Color;
+import android.graphics.PorterDuff.Mode;
+import android.view.View;
+import android.view.View.OnTouchListener;
 
 
 import java.util.List;
@@ -19,6 +28,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private Context mContext;
     private SurfaceHolder mHolder;
+    private SurfaceHolder holderTransparent;
+    private SurfaceView transparentView,imageView;
     private Camera mCamera;
     private List<Camera.Size> mSupportedPreviewSizes;
     private Camera.Size mPreviewSize;
@@ -40,11 +51,25 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.addCallback(this);
         // deprecated setting, but required on Android versions prior to 3.0
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+        transparentView = (SurfaceView)findViewById(R.id.TransparentView);
+        holderTransparent = getHolder();
+        holderTransparent.addCallback(this);
+        holderTransparent.setFormat(PixelFormat.TRANSLUCENT);
+        // deprecated setting, but required on Android versions prior to 3.0
+        holderTransparent.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+     //   transparentView.setOnTouchListener(onTouchListner);
+     //  prewInit();
+
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
         // empty. surfaceChanged will take care of stuff
+     //   transparentView.setOnTouchListener(onTouchListner);
     }
+
+
 
     public void surfaceDestroyed(SurfaceHolder holder) {
         // empty. Take care of releasing the Camera preview in your activity.
@@ -197,11 +222,75 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         } else {
             Log.i(TAG, "metering areas not supported");
         }
+
     }
+//test
+/*   private void prewInit() {
+        imageView = (SurfaceView) findViewById(R.id.ImageView);// 绑定SurfaceView并实例化
+
+    //    imageView.getHolder().setFixedSize((int) DisplayMessageActivity.screenWidth,
+    //            (int) BaseActivity.screenHeigth);
+        imageView.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        imageView.getHolder().addCallback(this);
+        // 给整个屏幕的SurfaceView设置一个触摸监听，实现全屏手动对焦
+        imageView.setOnTouchListener(new OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Rect touchRect = new Rect(
+                        (int)(event.getX()-100),
+                        (int)(event.getY()-100),
+                        (int)(event.getX()+100),
+                        (int)(event.getY()+100));
+                DrawFocusRect(touchRect , Color.BLUE);
+                return true;
+            }
+        });
+    } */
+
+    public OnTouchListener onTouchListner = new OnTouchListener() {
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            Rect touchRect = new Rect(
+                (int)(event.getX()-100),
+                (int)(event.getY()-100),
+                (int)(event.getX()+100),
+                (int)(event.getY()+100));
+            if (event.getAction() == MotionEvent.ACTION_DOWN){
+                DrawFocusRect(touchRect , Color.BLUE);
+            return true;}
+            else return false;
+        }
+    };
+
+
+    public void DrawFocusRect(Rect rec, int color)
+    {
+
+        //Canvas canvas = holderTransparent.lockCanvas();
+        Canvas canvas =mHolder.lockCanvas();
+        canvas.drawColor(0,Mode.CLEAR);
+        //border's properties
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(color);
+        paint.setStrokeWidth(3);
+        canvas.drawRect(rec, paint);
+        //holderTransparent.unlockCanvasAndPost(canvas);
+        mHolder.unlockCanvasAndPost(canvas);
+    }
+
 
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getPointerCount() == 1) {
+            Rect touchRect = new Rect(
+                    (int)(event.getX()-100),
+                    (int)(event.getY()-100),
+                    (int)(event.getX()+100),
+                    (int)(event.getY()+100));
             handleFocus(event, mCamera);
+            DrawFocusRect(touchRect,Color.BLUE);
         }
         else {
             switch (event.getAction() & MotionEvent.ACTION_MASK) {
