@@ -4,22 +4,13 @@ import com.example.geichun.camera.R;
 
 import android.content.Context;
 import android.hardware.Camera;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.MotionEvent;
-import android.graphics.PixelFormat;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Color;
-import android.graphics.PorterDuff.Mode;
-import android.view.View;
-import android.view.View.OnTouchListener;
-
-
+import android.hardware.Camera.Parameters;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -218,10 +209,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
 
-
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getPointerCount() == 1) {
             handleFocus(event, mCamera);
+            return false;
         }
         else {
             switch (event.getAction() & MotionEvent.ACTION_MASK) {
@@ -239,8 +230,32 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     break;
             }
         }
-        return false;
+        return true;
     }
+
+ /*   public boolean onTouchEvent(MotionEvent event) {
+     //   if (event.getPointerCount() == 1) {
+     //       handleFocus(event, mCamera);
+        //    return false;
+     //   }
+     //   else {
+            switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    oldDist = getFingerSpacing(event);
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float newDist = getFingerSpacing(event);
+                    if (newDist > oldDist) {
+                        handleZoom(true, mCamera);
+                    } else if (newDist < oldDist) {
+                        handleZoom(false, mCamera);
+                    }
+                    oldDist = newDist;
+                    break;
+            }
+      //  }
+        return true;
+    } */
 
     private static float getFingerSpacing(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
@@ -263,6 +278,56 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             camera.setParameters(params);
         } else {
             Log.i(TAG, "zoom not supported");
+        }
+    }
+
+    public static void turnLightOn(Camera mCamera) {
+        if (mCamera == null) {
+            return;
+            }
+        Parameters parameters = mCamera.getParameters();
+        if (parameters == null) {
+            return;
+         }
+        List<String> flashModes = parameters.getSupportedFlashModes();
+        // Check if camera flash exists
+        if (flashModes == null) {
+        // Use the screen as a flashlight (next best thing)
+            return;
+        }
+        String flashMode = parameters.getFlashMode();
+        if (!Parameters.FLASH_MODE_TORCH.equals(flashMode)) {
+        // Turn on the flash
+            if (flashModes.contains(Parameters.FLASH_MODE_TORCH)) {
+                parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
+                mCamera.setParameters(parameters);
+            } else {
+                }
+        }
+    }
+
+    public static void turnLightOff(Camera mCamera) {
+        if (mCamera == null) {
+            return;
+        }
+        Parameters parameters = mCamera.getParameters();
+        if (parameters == null) {
+           return;
+        }
+        List<String> flashModes = parameters.getSupportedFlashModes();
+         String flashMode = parameters.getFlashMode();
+        // Check if camera flash exists
+        if (flashModes == null) {
+           return;
+        }
+        if (!Parameters.FLASH_MODE_OFF.equals(flashMode)) {
+        // Turn off the flash
+             if (flashModes.contains(Parameters.FLASH_MODE_OFF)) {
+                parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
+                mCamera.setParameters(parameters);
+                } else {
+                Log.e(TAG, "FLASH_MODE_OFF not supported");
+            }
         }
     }
 }
