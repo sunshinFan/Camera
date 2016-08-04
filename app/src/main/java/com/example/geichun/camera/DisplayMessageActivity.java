@@ -85,30 +85,13 @@ public class DisplayMessageActivity extends ActionBarActivity {
             FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview );
             preview.addView(mPreview);
 
-            mFocus = new FocusImage(this);
-            preview.addView(mFocus);
-
-         //   mFocus.setOnTouchListener(new OnTouchListener());
-
-
+            mFocus = (com.example.geichun.camera.CameraPreview.FocusImage)findViewById(R.id.TransparentView);
 
             Button captureButton = (Button) findViewById(R.id.send );
             captureButton.setOnClickListener( new CaptureButtonOnClickListener());
         }
 
-    public class OnTouchListener implements View.OnTouchListener {
-        public boolean onTouch(View v, MotionEvent event) {
-            Rect touchRect = new Rect(
-                    (int)(event.getX()-100),
-                    (int)(event.getY()-100),
-                    (int)(event.getX()+100),
-                    (int)(event.getY()+100));
-            if (event.getAction() == MotionEvent.ACTION_DOWN){
-                mFocus.DrawFocusRect(touchRect , Color.BLUE);
-                return true;}
-            else return false;
-        }
-    }
+
 
     public class CaptureButtonOnClickListener implements View.OnClickListener{
         public void onClick(View v) {

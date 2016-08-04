@@ -18,7 +18,7 @@
             android:id="@+id/ImageView"
             android:layout_alignParentTop="true"/>
 
-    <SurfaceView
+    <com.example.geichun.camera.CameraPreview.FocusImage
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/TransparentView"
